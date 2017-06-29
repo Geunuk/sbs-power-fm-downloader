@@ -1,6 +1,6 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
-from re import search, findall
+from re import findall
 
 def program_scrawl(url, station):
 
@@ -28,5 +28,5 @@ def to_down_url(pgm_url):
 	down_url = pgm_bs.find("frame", {"id" : "body"}).attrs["src"]
 	down_url = findall("vVodId=V..........", down_url)
 	down_url = "http://wizard2.sbs.co.kr/w3/template/tp1_podcast_radio_list_down.jsp?" + down_url[0]
-	print("i'm okay" + down_url)
+	
 	return down_url
