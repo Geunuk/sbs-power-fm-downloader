@@ -62,25 +62,33 @@ def url_change(down_url):
 	return down_url
 
 
+def input_cond(pgm_info):
 
-def down_pgm(pgm_name, down_url):
+	pgm_name = input("Input program Want to Download : ") 
+	print('-' * 40)
 
-	if False:
-		print("Input Period Want to Download")
-		start = input("Start : ")
-		end = input("End : ")
-		print("-" * 40)
+	for i in range(0, len(pgm_info)):
+	
+		if pgm_info[i]["name"] == pgm_name:
+			down_url = pgm_info[i]["down_url"]
 
-		print("Input Day of the Week Want to Download")
-		day = input("Day : ")
+	print("Input Period Want to Download")
+	start = input("Start : ")
+	end = input("End : ")
+	print("-" * 40)
 
-	start = "2017-05-01"
-	end = "2017-05-015"
-	day = "mon"
+	print("Input Day of the Week Want to Download")
+	day = input("Day : ")
+	print("-" * 40)
 
 	day_list = day_index(day)
 	start = date_format(start)
 	end = date_format(end)
+
+	return pgm_name, down_url, start, end, day_list
+
+
+def down_pgm(pgm_name, down_url, start, end, day_list):
 
 	down_html = urlopen(down_url)
 	down_bs = BeautifulSoup(down_html, "html.parser")
@@ -117,4 +125,4 @@ def down_pgm(pgm_name, down_url):
 			urlretrieve(episode[2].input.attrs["value"], directory + "/" + epi_name + ".mp3")
 	
 	next_page = url_change(down_url)
-	down_pgm(pgm_name, next_page)
+	down_pgm(pgm_name, next_page, start, end, day_list)
