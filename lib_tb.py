@@ -2,6 +2,7 @@ from pymysql import connect, cursors
 
 def connect_tb():
 
+	print("-" * 40)
 	host_name = input("input host : ")
 	user_name = input("input user : ")
 	pw_name = input("input password : ")
@@ -32,10 +33,19 @@ def print_tb(cursor):
 	cursor.execute("SELECT name FROM schedule")	
 	rows = cursor.fetchall()
 	
-	print("------------------------------------------")
+	print("-" * 40)
 	print("This Is the List of Program")
-	print("------------------------------------------")
+	print("-" * 40)
 	for row in rows:
 		print(row["name"])
-	print("------------------------------------------")
+	print("-" * 40)
+
+	cursor.execute("SELECT name, down_url FROM schedule")
+	rows = cursor.fetchall()
+	return rows
+
+def drop_tb(cursor):
+
+	cursor.execute("DROP TABLE schedule")
+	
 	

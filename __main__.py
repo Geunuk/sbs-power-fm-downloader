@@ -1,5 +1,6 @@
 from find_program import *
 from lib_tb import *
+from down_pgm import down_pgm
 
 def mk_list(url, stion, cursor):
 
@@ -15,6 +16,17 @@ mk_list(power_url, "power", cursor)
 mk_list(love_url, "love", cursor)
 
 connection.commit()
-print_tb(cursor)
-
+pgm_info = print_tb(cursor)
+drop_tb(cursor)
 connection.close()	
+
+pgm_name = input("Input program Want to Download : ") 
+print('-' * 40)
+
+for i in range(0, len(pgm_info)):
+	
+	if pgm_info[i]["name"] == pgm_name:
+		down_url = pgm_info[i]["down_url"]
+
+down_pgm(pgm_name, down_url)
+
