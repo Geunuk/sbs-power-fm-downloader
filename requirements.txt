@@ -1,0 +1,12 @@
+요구사항
+
+- DBMS 사용 X
+- json
+
+용어 정리
+- program
+- show
+
+Prerequsite
+- Beautifulsoup4
+- pyqt5
