@@ -19,7 +19,6 @@ class NoBannerException(Exception):
     def __str__(self):
         return "No banner at the page"
 
-
 class NoDownBannerException(Exception):
     def __str__(self):
         return "No download banner at the page"
@@ -49,8 +48,8 @@ def get_programs(driver):
             program_dict[program.text] = program["href"]
 
         next_btn.click()
-        allprog = driver.find_element_by_class_name("allprog_inner_powerfm")
-        next_btn = allprog.find_element_by_class_name("program_btn_next")
+        allprogram = driver.find_element_by_class_name("allprog_inner_powerfm")
+        next_btn = allprogram.find_element_by_class_name("program_btn_next")
 
     return program_dict
 
@@ -61,6 +60,8 @@ def get_episodes(driver, program_down_url):
         WebDriverWait(driver, 20).until(element_present)
     except TimeoutException:
         print("timed out waiting for page to load")
+
+    program_name = driver.find_element_by_name("twitter:title").get_attribute("content")
 
     page = 1
     result = []
@@ -77,13 +78,13 @@ def get_episodes(driver, program_down_url):
             url = episode.select("div > a")[0]["href"].strip()
             url = download_url_prefix + url
 
-            e = Episode(date, name, url)
+            e = Episode(program_name, date, name, url)
             result.append(e)
             print(e)
 
             if i == 0:
                 first_date = date.strftime("%Y%m%d")
-        return result
+
         try:
             next_download_page(driver, page, first_date)
             page += 1
@@ -98,10 +99,11 @@ def get_episodes_cond(driver, program_down_url, start_date, end_date, week_days)
     except TimeoutException:
         print("timed out waiting for page to load")
 
+    program_name = driver.find_element_by_name("twitter:title").get_attribute("content")
+
     page = 1
     result = []
     while True:
-        print("Download page {}".format(page))
         program_down_html = driver.execute_script(return_html_string)
         program_down_soup = BeautifulSoup(program_down_html, "html.parser")
         episodes = program_down_soup.find_all("li", class_="podcast_list_inner")
@@ -119,9 +121,8 @@ def get_episodes_cond(driver, program_down_url, start_date, end_date, week_days)
             if date < start_date:
                 return result
             elif date <= end_date and date.weekday() in week_days:
-                e = Episode(date, name, url)
+                e = Episode(program_name, date, name, url)
                 result.append(e)
-                print(e)
 
         try:
             next_download_page(driver, page, first_date)
@@ -129,9 +130,8 @@ def get_episodes_cond(driver, program_down_url, start_date, end_date, week_days)
         except NoSuchElementException:
             return result
 
-
 def next_download_page(driver, page, first_date):
-    def not_text_topresent_in_element(_driver):
+    def not_text_to_be_present_in_element(_driver):
         element_present = EC.text_to_be_present_in_element((By.CLASS_NAME, "podcast_date"), first_date)
         return not element_present(_driver)
 
@@ -144,7 +144,7 @@ def next_download_page(driver, page, first_date):
 
     driver.find_element_by_id(id_).click()
     try:
-        WebDriverWait(driver, 20).until(not_text_topresent_in_element)
+        WebDriverWait(driver, 20).until(not_text_to_be_present_in_element)
     except TimeoutException:
         print("timed out waiting for page to load")
 
@@ -153,7 +153,6 @@ def check_down_link(program_soup):
     program_down_url = program_down_url.find("h3")
     program_down_url = program_down_url.select("a")[0]["href"]
     return program_down_url
-
 
 def check_middle_link(program_soup):
     banner = program_soup.find("div", class_="bnr_inner slick-slide slick-current slick-active")
@@ -165,14 +164,12 @@ def check_middle_link(program_soup):
     else:
         raise NoDownBannerException
 
-
 def check_top_link(program_soup):
     items = program_soup.find("div", class_="program_lnb_w").find_all("li")
     for item in items:
         if "다시듣기" in item.select("a")[0].text:
             program_down_url = item.select("a")[0]["href"]
             return program_down_url
-
 
 def get_download_url(driver, program_url):
     driver.get(program_url)
@@ -229,8 +226,6 @@ def download_test():
     get_episodes(driver, program_down_url)
 
 def download_cond_test():
-    import datetime
-
     program_url = "https://programs.sbs.co.kr/radio/ten"#sominyoungstreet"
     driver = webdriver.Chrome()
     program_down_url = get_download_url(driver, program_url)
@@ -239,7 +234,6 @@ def download_cond_test():
     sevenago = now - datetime.timedelta(days=14)
     week_days = [1, 3, 4]
     get_episodes_cond(driver, program_down_url, sevenago, now,week_days)
-
 
 def main():
     #total_text()

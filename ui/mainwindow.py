@@ -152,8 +152,8 @@ class Ui_MainWindow(object):
     def initialize(self, driver):
         self.driver = driver
 
-        # Initialize call back functino
-        self.query_btn.clicked.connect(self.query_btn_clicked)
+        # Initialize call back function
+        self.query_btn.clicked.connect(self.query)
         self.episode_list.itemDoubleClicked.connect(self.download_episode)
 
         # Set start time and end time
@@ -166,38 +166,58 @@ class Ui_MainWindow(object):
         self.end_date.setDate(QtCore.QDate(now.year, now.month, now.day))
         self.start_date.setDate(QtCore.QDate(now_minus_7.year, now_minus_7.month, now_minus_7.day))
 
+        self.init_program_list()
+
+        """
         # Loading program list
         loading_dialog = QtWidgets.QDialog()
         loading_ui = loading.Ui_Dialog()
         loading_ui.setupUi(loading_dialog)
         loading_ui.loading_label.setText("Loading program list. Please wait a second...")
         loading_dialog.show()
+        import sys
+        sys.exit()
 
 
-        self.init_program_list()
         #removed
-        self.program_list.itemDoubleClicked.connect(self.set_episode_list)
+        #self.program_list.itemDoubleClicked.connect(self.set_episode_list)
 
         # Finish to Load program list
         loading_dialog.close()
-
+        """
     def download_episode(self):
+        selected_file_name = self.episode_list.currentItem().text()
+        for e in self.query_result:
+            if e.file_name == selected_file_name:
+                e.download()
+
+        """
         import os
         file_name = self.episode_list.currentItem().text()
         for episode in self.query_result:
             if episode.file_name == file_name:
                 os.system("wget " + "'" + episode.url + "'")
+        """
+    def query(self):
+        # Clear previous query result
+        self.episode_list.clear()
+        self.query_result = None
 
-    def query_btn_clicked(self):
         # Loading query result
         program_name = self.program_list.currentItem().text()
         program_url = self.program_dict[program_name]
 
-        loading_dialog = QtWidgets.QDialog()
-        loading_ui = loading.Ui_Dialog()
-        loading_ui.setupUi(loading_dialog)
-        loading_ui.loading_label.setText("Loading query result. Please wait a second...")
-        loading_dialog.show()
+        """
+        loading.Loading_Thread().start()
+        
+        self.loading_dialog = QtWidgets.QDialog()
+        self.loading_ui = loading.Ui_Dialog()
+        self.loading_ui.setupUi(self.loading_dialog)
+        #self.loading_ui.loading_label.setText("Loading...")
+        self.loading_dialog.show()
+        # Finish querying
+        #self.loading_dialog.close()
+        """
 
         # Collecting query info
         min_time = datetime.datetime.min.time()
@@ -215,25 +235,14 @@ class Ui_MainWindow(object):
 
         query_string = self.query_line.text()
 
-
-        # REMOVED???
-        #query_info = [program_url, start_date, end_date, checked_week_days, query_string]
-        #program_url, start_date, end_date = query_info[0], query_info[1], query_info[2]
-        #week_days, query_string = query_info[3], query_info[4]
-        # query_result = search.query(self.driver, query_info)
-
         # Querying
         program_down_url = scraper.get_download_url(self.driver, program_url)
         self.query_result = scraper.get_episodes_cond(self.driver, program_down_url, start_date, end_date, checked_week_days)
 
         if query_string != '':
-            print("here", query_string)
             self.query_result = [e for e in self.query_result if query_string in e.name]
 
         self.show_query_result()
-
-        # Finish querying
-        loading_dialog.close()
 
     def show_query_result(self):
         self.episode_list.addItems([episode.file_name for episode in self.query_result])
@@ -252,6 +261,7 @@ class Ui_MainWindow(object):
     def init_program_list(self):
         self.program_dict = scraper.get_programs(self.driver)
         self.program_list.addItems([name for name in self.program_dict.keys()])
+
 
 if __name__ == "__main__":
     import sys
