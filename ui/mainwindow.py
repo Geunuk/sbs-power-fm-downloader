@@ -95,24 +95,6 @@ class Ui_MainWindow(object):
         self.episode_list = QtWidgets.QListWidget(self.centralwidget)
         self.episode_list.setObjectName("episode_list")
         self.verticalLayout_2.addWidget(self.episode_list)
-        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_5.setContentsMargins(150, -1, 0, -1)
-        self.horizontalLayout_5.setSpacing(50)
-        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
-        self.prev_button = QtWidgets.QPushButton(self.centralwidget)
-        self.prev_button.setAutoDefault(False)
-        self.prev_button.setDefault(False)
-        self.prev_button.setObjectName("prev_button")
-        self.horizontalLayout_5.addWidget(self.prev_button)
-        self.next_button = QtWidgets.QPushButton(self.centralwidget)
-        self.next_button.setObjectName("next_button")
-        self.horizontalLayout_5.addWidget(self.next_button)
-        self.paget_label = QtWidgets.QLabel(self.centralwidget)
-        self.paget_label.setText("")
-        self.paget_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.paget_label.setObjectName("paget_label")
-        self.horizontalLayout_5.addWidget(self.paget_label)
-        self.verticalLayout_2.addLayout(self.horizontalLayout_5)
         self.gridLayout.addLayout(self.verticalLayout_2, 0, 2, 1, 1)
         self.center_line = QtWidgets.QFrame(self.centralwidget)
         self.center_line.setFrameShape(QtWidgets.QFrame.VLine)
@@ -144,8 +126,6 @@ class Ui_MainWindow(object):
         self.sat_check_box.setText(_translate("MainWindow", "토요일"))
         self.sun_check_box.setText(_translate("MainWindow", "일요일"))
         self.query_btn.setText(_translate("MainWindow", "검색"))
-        self.prev_button.setText(_translate("MainWindow", "<"))
-        self.next_button.setText(_translate("MainWindow", ">"))
 
     # ------------------------------------------------------------------------------------
 
@@ -168,36 +148,12 @@ class Ui_MainWindow(object):
 
         self.init_program_list()
 
-        """
-        # Loading program list
-        loading_dialog = QtWidgets.QDialog()
-        loading_ui = loading.Ui_Dialog()
-        loading_ui.setupUi(loading_dialog)
-        loading_ui.loading_label.setText("Loading program list. Please wait a second...")
-        loading_dialog.show()
-        import sys
-        sys.exit()
-
-
-        #removed
-        #self.program_list.itemDoubleClicked.connect(self.set_episode_list)
-
-        # Finish to Load program list
-        loading_dialog.close()
-        """
     def download_episode(self):
         selected_file_name = self.episode_list.currentItem().text()
         for e in self.query_result:
             if e.file_name == selected_file_name:
                 e.download()
 
-        """
-        import os
-        file_name = self.episode_list.currentItem().text()
-        for episode in self.query_result:
-            if episode.file_name == file_name:
-                os.system("wget " + "'" + episode.url + "'")
-        """
     def query(self):
         # Clear previous query result
         self.episode_list.clear()
@@ -206,18 +162,6 @@ class Ui_MainWindow(object):
         # Loading query result
         program_name = self.program_list.currentItem().text()
         program_url = self.program_dict[program_name]
-
-        """
-        loading.Loading_Thread().start()
-        
-        self.loading_dialog = QtWidgets.QDialog()
-        self.loading_ui = loading.Ui_Dialog()
-        self.loading_ui.setupUi(self.loading_dialog)
-        #self.loading_ui.loading_label.setText("Loading...")
-        self.loading_dialog.show()
-        # Finish querying
-        #self.loading_dialog.close()
-        """
 
         # Collecting query info
         min_time = datetime.datetime.min.time()
@@ -249,14 +193,6 @@ class Ui_MainWindow(object):
 
     def set_start_date_max(self):
         self.start_date.setMaximumDate(self.end_date.date())
-
-    # removed
-    def set_episode_list(self):
-        program_name = self.program_list.currentItem().text()
-        program_url = self.program_dict[program_name]
-        download_url = scraper.get_download_url(self.driver, program_url)
-        self.episodes = scraper.get_episodes(self.driver, download_url)
-        self.episode_list.addItems([episode.name for episode in self.episodes])
 
     def init_program_list(self):
         self.program_dict = scraper.get_programs(self.driver)

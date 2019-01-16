@@ -8,7 +8,6 @@ class Episode():
         self.name = name
         self.url = url
         self.file_name = self.date.strftime("%y%m%d ") + self.name + ".mp3"
-        self.is_downloaded = False
 
     def __str__(self):
         string = ""
@@ -25,6 +24,8 @@ class Episode():
         if not os.path.exists(download_dir):
             os.mkdir(download_dir)
 
+        print("download_dir", download_dir)
+        print("program name", self.program_name)
         download_path = os.path.join(download_dir, self.program_name)
         if not os.path.exists(download_path):
             os.mkdir(download_path)
