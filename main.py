@@ -8,9 +8,9 @@ from ui import mainwindow
 
 def main():
     if platform.system() == "Linux":
-        driver_name = "chromedriver44"
+        driver_name = "chromedriver"
     elif platform.system() == "Windows":
-        driver_name = "chromedriver44.exe"
+        driver_name = "chromedriver.exe"
     else:
         print("Only works in Linux or Windows")
         return
